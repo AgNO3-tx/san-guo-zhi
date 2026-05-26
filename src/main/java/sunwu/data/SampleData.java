@@ -1,0 +1,151 @@
+package sunwu.data;
+
+import sunwu.domain.ArmyType;
+import sunwu.domain.BattlefieldGraph;
+import sunwu.domain.BoatConfig;
+import sunwu.domain.Edge;
+import sunwu.domain.General;
+import sunwu.domain.TerrainType;
+import sunwu.domain.WeightedBattlefieldGraph;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public final class SampleData {
+    private SampleData() {
+    }
+
+    public static List<General> generals() {
+        return List.of(
+            new General("Zhang Zhao", ArmyType.ARCHER, 22, 80, 89, 99, 60),
+            new General("Zhou Yu", ArmyType.CAVALRY, 80, 86, 97, 80, 90),
+            new General("Xu Sheng", ArmyType.ARCHER, 90, 78, 72, 40, 94),
+            new General("Zhu Ge Jin", ArmyType.ARCHER, 63, 61, 88, 82, 71),
+            new General("Lu Su", ArmyType.INFANTRY, 43, 87, 84, 88, 53),
+            new General("Tai Shi Ci", ArmyType.CAVALRY, 96, 81, 43, 33, 97),
+            new General("Xiao Qiao", ArmyType.INFANTRY, 42, 52, 89, 77, 34),
+            new General("Da Qiao", ArmyType.CAVALRY, 39, 62, 90, 62, 41),
+            new General("Zhou Tai", ArmyType.INFANTRY, 92, 89, 72, 43, 99),
+            new General("Gan Ning", ArmyType.ARCHER, 98, 92, 45, 23, 97),
+            new General("Lu Meng", ArmyType.CAVALRY, 70, 77, 93, 83, 88),
+            new General("Huang Gai", ArmyType.INFANTRY, 83, 98, 72, 42, 89)
+        );
+    }
+
+    public static BoatConfig classicBoatConfig() {
+        Map<String, Integer> directions = new LinkedHashMap<>();
+        directions.put("front", 10);
+        directions.put("left", 50);
+        directions.put("right", 50);
+        directions.put("back", 15);
+        return new BoatConfig(directions);
+    }
+
+    public static BoatConfig dynamicBoatConfig() {
+        return classicBoatConfig();
+    }
+
+    public static BattlefieldGraph battlefieldGraph() {
+        return new BattlefieldGraph(Map.of(
+            1, List.of(2, 3, 6, 10),
+            2, List.of(1, 4),
+            3, List.of(1, 4, 7),
+            4, List.of(2, 3, 5),
+            5, List.of(4, 6, 7),
+            6, List.of(1, 5, 7, 8),
+            7, List.of(3, 5, 6, 8, 9),
+            8, List.of(6, 7, 9, 10),
+            9, List.of(7, 8, 10),
+            10, List.of(1, 8, 9)
+        ));
+    }
+
+    public static WeightedBattlefieldGraph weightedBattlefieldGraph() {
+        return new WeightedBattlefieldGraph(Map.of(
+            1, List.of(
+                new Edge(2, TerrainType.FOREST),
+                new Edge(3, TerrainType.FLAT),
+                new Edge(6, TerrainType.FLAT),
+                new Edge(10, TerrainType.FLAT)
+            ),
+            2, List.of(
+                new Edge(1, TerrainType.FOREST),
+                new Edge(4, TerrainType.SWAMP)
+            ),
+            3, List.of(
+                new Edge(1, TerrainType.FLAT),
+                new Edge(4, TerrainType.SWAMP),
+                new Edge(7, TerrainType.PLANK)
+            ),
+            4, List.of(
+                new Edge(2, TerrainType.SWAMP),
+                new Edge(3, TerrainType.SWAMP),
+                new Edge(5, TerrainType.SWAMP)
+            ),
+            5, List.of(
+                new Edge(4, TerrainType.SWAMP),
+                new Edge(6, TerrainType.FLAT),
+                new Edge(7, TerrainType.FOREST)
+            ),
+            6, List.of(
+                new Edge(1, TerrainType.FLAT),
+                new Edge(5, TerrainType.FLAT),
+                new Edge(7, TerrainType.FOREST),
+                new Edge(8, TerrainType.PLANK)
+            ),
+            7, List.of(
+                new Edge(3, TerrainType.PLANK),
+                new Edge(5, TerrainType.FOREST),
+                new Edge(6, TerrainType.FOREST),
+                new Edge(8, TerrainType.FLAT),
+                new Edge(9, TerrainType.FLAT)
+            ),
+            8, List.of(
+                new Edge(6, TerrainType.PLANK),
+                new Edge(7, TerrainType.FLAT),
+                new Edge(9, TerrainType.SWAMP),
+                new Edge(10, TerrainType.FOREST)
+            ),
+            9, List.of(
+                new Edge(7, TerrainType.FLAT),
+                new Edge(8, TerrainType.SWAMP),
+                new Edge(10, TerrainType.FLAT)
+            ),
+            10, List.of(
+                new Edge(1, TerrainType.FLAT),
+                new Edge(8, TerrainType.FOREST),
+                new Edge(9, TerrainType.FLAT)
+            )
+        ));
+    }
+
+    public static int[][] simpleFireGrid() {
+        return new int[][]{
+            {1, 1, 0, 0},
+            {1, 0, 0, 0},
+            {0, 0, 1, 1},
+            {0, 0, 0, 1}
+        };
+    }
+
+    public static int[][] optimizedFireGrid() {
+        return new int[][]{
+            {1, 1, 0, 0, 0},
+            {1, 1, 1, 0, 0},
+            {0, 1, 1, 0, 0},
+            {0, 1, 1, 0, 0},
+            {1, 0, 0, 0, 0}
+        };
+    }
+
+    public static int[][] huaRongMaze() {
+        return new int[][]{
+            {1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {1, 2, 0, 0, 0, 1, 0, 3, 1},
+            {1, 1, 1, 0, 1, 1, 0, 1, 1},
+            {1, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 1, 1, 1, 1, 1, 1, 1, 1}
+        };
+    }
+}
