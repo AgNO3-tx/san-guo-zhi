@@ -8,6 +8,11 @@ import sunwu.service.GeneralAnalyticsService;
 import sunwu.service.HierarchyService;
 import sunwu.service.MazeEscapeService;
 import sunwu.service.ReportFormatter;
+import sunwu.ui.DashboardFeature;
+import sunwu.ui.SunWuDashboard;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * 验证菜单和格式化输出中用于汇报展示的关键文本。
@@ -53,5 +58,94 @@ public final class DisplayTextTest {
             new ClusterFireService().countClusters(SampleData.simpleFireGrid())
         );
         TestSupport.assertTrue(fire.contains("Cluster count: 2"), "Fire report should state cluster count.");
+
+        // 新版 GUI 必须按英文 PDF 的作业板块组织，方便展示 basic 与 extra features 是否完整。
+        List<DashboardFeature> features = SunWuDashboard.featureCatalog();
+        TestSupport.assertTrue(features.size() >= 10, "Dashboard should expose basic and extra assignment sections.");
+        TestSupport.assertTrue(
+            features.stream().anyMatch(feature -> feature.pdfSection().contains("Forming Wu Kingdom")),
+            "Dashboard should map the hierarchy feature to the PDF section."
+        );
+        TestSupport.assertTrue(
+            features.stream().anyMatch(feature -> feature.requirementType().equals("Extra Feature")
+                && feature.pdfSection().contains("Graphic User Interface")),
+            "Dashboard should explicitly list the GUI extra feature."
+        );
+        TestSupport.assertTrue(
+            SunWuDashboard.buildOverviewText().contains("Basic Features"),
+            "Dashboard overview should separate basic features."
+        );
+
+        // GUI 按钮最终调用这些 builder。这里不只检查目录存在，也检查每个汇报入口能生成可展示内容。
+        assertDashboardText(SunWuDashboard.buildHierarchyText(), "Sun Quan", "Hierarchy GUI output should include the root.");
+        assertDashboardText(
+            SunWuDashboard.buildSoldierArrangementText(AbilityType.POLITIC, 99, 3),
+            "Team ranking",
+            "Soldier arrangement GUI output should include team ranking."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildClassicArrowText(List.of(2000, 1500, 1000, 800, 600, 500, 300, 300)),
+            "Classic Straw Boat Borrowing",
+            "Classic arrow GUI output should include the original straw boat plan."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildDynamicArrowText(List.of(300, 1500, 1000, 2000, 600, 800, 300, 500, 400)),
+            "Dynamic Straw Boat Borrowing",
+            "Dynamic arrow GUI output should include the extra rule plan."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildFortressBfsText(8),
+            "BFS shortest paths to node 8",
+            "Fortress GUI output should include BFS shortest paths."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildWeightedPathText("Xu Sheng", 8),
+            "Total time",
+            "Weighted fortress GUI output should include Dijkstra total time."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildFoodHarvestText(Set.of(9)),
+            "Food harvesting without nodes",
+            "Food harvesting GUI output should show filtered route planning."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildFoodProductionText(AbilityType.POLITIC, 8),
+            "Food Harvesting I",
+            "Food Harvesting I GUI output should show the extra feature."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildGuardedCampText(),
+            "Food Harvesting II",
+            "Food Harvesting II GUI output should show guarded camp simulation."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildCipherText("^olssv$", 7),
+            "Decoded",
+            "Encrypted Text GUI output should include decoded text."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildSecureCipherText("Attack at dawn", 3),
+            "Decrypted",
+            "Secure text GUI output should verify decrypting the generated cipher."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildFireClusterText(),
+            "Cluster count",
+            "Red Cliff GUI output should show cluster count."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildOptimalFireText(),
+            "Optimal ignition points",
+            "Optimized fire GUI output should show optimized points."
+        );
+        assertDashboardText(
+            SunWuDashboard.buildMazeText(),
+            "Hua Rong Road Maze",
+            "Hua Rong Road GUI output should show the maze."
+        );
+    }
+
+    private static void assertDashboardText(String actual, String expected, String message) {
+        TestSupport.assertTrue(actual.contains(expected), message);
     }
 }

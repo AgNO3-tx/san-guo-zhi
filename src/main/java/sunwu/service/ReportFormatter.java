@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 /**
  * 文本格式化器。
- * 服务层返回结构化结果，这里统一转换成控制台和 Swing 文本看板可展示的字符串。
+ * 服务层返回结构化结果，这里统一转换成控制台和 Swing 综合演示台可展示的字符串。
  */
 public final class ReportFormatter {
     /**
