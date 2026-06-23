@@ -62,7 +62,7 @@ public final class SampleData {
             4, List.of(2, 3, 5),
             5, List.of(4, 6, 7),
             6, List.of(1, 5, 7, 8),
-            7, List.of(3, 5, 6, 8, 9),
+            7, List.of(5, 6, 8, 9),
             8, List.of(6, 7, 9, 10),
             9, List.of(7, 8, 10),
             10, List.of(1, 8, 9)
@@ -70,7 +70,7 @@ public final class SampleData {
     }
 
     public static WeightedBattlefieldGraph weightedBattlefieldGraph() {
-        // 带地形版本的战场图，边上的 TerrainType 会参与耗时计算。
+        // PDF 地形表使用 "1 - 6" 这类连线记法，因此扩展题按无向地形边展开。
         return new WeightedBattlefieldGraph(Map.of(
             1, List.of(
                 new Edge(2, TerrainType.FOREST),
@@ -153,11 +153,17 @@ public final class SampleData {
     public static int[][] huaRongMaze() {
         // 华容道迷宫：1=墙，0=通路，2=起点，3=出口。
         return new int[][]{
-            {1, 1, 1, 1, 1, 1, 1, 1, 1},
-            {1, 2, 0, 0, 0, 1, 0, 3, 1},
-            {1, 1, 1, 0, 1, 1, 0, 1, 1},
-            {1, 0, 0, 0, 0, 0, 0, 0, 1},
-            {1, 1, 1, 1, 1, 1, 1, 1, 1}
+            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+            {2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1},
+            {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1},
+            {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+            {1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1},
+            {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+            {1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1},
+            {1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+            {1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
+            {1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 3},
+            {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
         };
     }
 }

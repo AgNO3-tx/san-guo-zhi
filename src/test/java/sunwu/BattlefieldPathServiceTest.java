@@ -22,6 +22,10 @@ public final class BattlefieldPathServiceTest {
         PathResult shortest = service.findShortestPaths(SampleData.battlefieldGraph(), 1, 8);
         TestSupport.assertTrue(shortest.paths().contains(List.of(1, 6, 8)), "Expected path 1->6->8 should exist.");
         TestSupport.assertTrue(shortest.paths().contains(List.of(1, 10, 8)), "Expected path 1->10->8 should exist.");
+        TestSupport.assertTrue(
+            !SampleData.battlefieldGraph().adjacency().get(7).contains(3),
+            "Basic battlefield graph should keep the assignment's directed 3->7 edge one-way."
+        );
 
         General xuSheng = SampleData.generals().stream()
             .filter(g -> g.name().equals("Xu Sheng"))

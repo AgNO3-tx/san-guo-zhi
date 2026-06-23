@@ -34,6 +34,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
@@ -48,6 +49,7 @@ public final class SunWuDashboard {
     private static final Font MONO_FONT = new Font(Font.MONOSPACED, Font.PLAIN, 14);
     private static final String SAMPLE_CIPHER = "^hkcpzl$^jhv$^jhv$av$bzl$^aol$^johpu$^zayhalnlt,$(ojpod)$pz$av$johpu$opz$(zwpozlsaahi)$dpao$zayvun$pyvu$johpuz.";
     private static SwingWorker<String, Void> activeWorker;
+    private static SwingWorker<Optional<VisualizationTrace>, Void> activeVisualizationWorker;
 
     private SunWuDashboard() {
     }
@@ -74,6 +76,38 @@ public final class SunWuDashboard {
         );
     }
 
+    public static Optional<VisualizationTrace> visualizationTraceFor(DashboardFeature feature) {
+        String pdfSection = feature.pdfSection();
+        if (pdfSection.contains("Borrowing Arrows")) {
+            return Optional.of(VisualizationTraceFactory.classicBoatTrace(List.of(2000, 1500, 1000, 800, 600, 500, 300, 300)));
+        }
+        if (pdfSection.contains("Enemy Fortress Attack Simulation") && feature.requirementType().equals("Basic Feature")) {
+            return Optional.of(VisualizationTraceFactory.fortressBfsTrace(8));
+        }
+        if (pdfSection.equals("5. Food Harvesting")) {
+            return Optional.of(VisualizationTraceFactory.foodHarvestTrace(Set.of(9)));
+        }
+        if (pdfSection.equals("7. Red Cliff on Fire")) {
+            return Optional.of(VisualizationTraceFactory.fireClusterTrace());
+        }
+        if (pdfSection.contains("Hua Rong")) {
+            return Optional.of(VisualizationTraceFactory.mazeTrace());
+        }
+        if (pdfSection.contains("Extra Algorithm")) {
+            return Optional.of(VisualizationTraceFactory.weightedPathTrace("Xu Sheng", 8));
+        }
+        if (pdfSection.contains("Dynamic Arrow")) {
+            return Optional.of(VisualizationTraceFactory.dynamicBoatTrace(List.of(300, 1500, 1000, 2000, 600, 800, 300, 500, 400)));
+        }
+        if (pdfSection.contains("Food Harvesting I")) {
+            return Optional.of(VisualizationTraceFactory.guardedCampTrace());
+        }
+        if (pdfSection.contains("Optimized Points")) {
+            return Optional.of(VisualizationTraceFactory.optimizedFireTrace());
+        }
+        return Optional.empty();
+    }
+
     public static void showWindow() {
         SwingUtilities.invokeLater(SunWuDashboard::createAndShow);
     }
@@ -98,14 +132,18 @@ public final class SunWuDashboard {
         descriptionArea.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 13));
 
         JPanel controlPanel = new JPanel(new BorderLayout());
+        JPanel visualizationPanel = new JPanel(new BorderLayout(8, 8));
         JPanel workPanel = new JPanel(new BorderLayout(8, 8));
+        JPanel topWorkPanel = new JPanel(new BorderLayout(8, 8));
         JPanel headerPanel = new JPanel(new GridLayout(3, 1, 4, 4));
         headerPanel.add(titleLabel);
         headerPanel.add(metaLabel);
         headerPanel.add(new JScrollPane(descriptionArea));
 
         detailPanel.add(headerPanel, BorderLayout.NORTH);
-        workPanel.add(controlPanel, BorderLayout.NORTH);
+        topWorkPanel.add(controlPanel, BorderLayout.NORTH);
+        topWorkPanel.add(visualizationPanel, BorderLayout.CENTER);
+        workPanel.add(topWorkPanel, BorderLayout.NORTH);
         workPanel.add(new JScrollPane(outputArea), BorderLayout.CENTER);
         detailPanel.add(workPanel, BorderLayout.CENTER);
 
@@ -118,14 +156,19 @@ public final class SunWuDashboard {
                 if (feature != null) {
                     try {
                         cancelActiveWorker();
+                        cancelActiveVisualizationWorker();
                         titleLabel.setText(feature.title());
                         metaLabel.setText(feature.requirementType() + " | PDF: " + feature.pdfSection() + " | Menu: " + feature.menuItems());
                         descriptionArea.setText(feature.description());
                         controlPanel.removeAll();
-                        controlPanel.add(createControls(feature, outputArea), BorderLayout.NORTH);
+                        visualizationPanel.removeAll();
+                        controlPanel.add(createControls(feature, outputArea, visualizationPanel), BorderLayout.NORTH);
+                        runVisualization(visualizationPanel, () -> visualizationTraceFor(feature));
                         outputArea.setText(buildFeatureSummary(feature));
                         controlPanel.revalidate();
                         controlPanel.repaint();
+                        visualizationPanel.revalidate();
+                        visualizationPanel.repaint();
                     } catch (RuntimeException exception) {
                         outputArea.setText(formatError(exception));
                     }
@@ -163,7 +206,7 @@ public final class SunWuDashboard {
     /**
      * 根据所选 PDF 板块创建对应输入控件。
      */
-    private static JPanel createControls(DashboardFeature feature, JTextArea outputArea) {
+    private static JPanel createControls(DashboardFeature feature, JTextArea outputArea, JPanel visualizationPanel) {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
         String pdfSection = feature.pdfSection();
 
@@ -191,24 +234,33 @@ public final class SunWuDashboard {
             panel.add(new JLabel("箭雨:"));
             panel.add(waves);
             JButton runButton = new JButton("运行原题规则");
-            runButton.addActionListener(event -> runFeature(outputArea, () -> buildClassicArrowText(parseIntegerList(
-                waves.getText(),
-                List.of(2000, 1500, 1000, 800, 600, 500, 300, 300)
-            ))));
+            runButton.addActionListener(event -> {
+                List<Integer> parsedWaves = parseIntegerList(waves.getText(), List.of(2000, 1500, 1000, 800, 600, 500, 300, 300));
+                runVisualization(visualizationPanel, () -> Optional.of(VisualizationTraceFactory.classicBoatTrace(parsedWaves)));
+                runFeature(outputArea, () -> buildClassicArrowText(parsedWaves));
+            });
             panel.add(runButton);
         } else if (pdfSection.contains("Enemy Fortress Attack Simulation") && feature.requirementType().equals("Basic Feature")) {
             JTextField target = new JTextField("8", 5);
             panel.add(new JLabel("敌营节点:"));
             panel.add(target);
             JButton runButton = new JButton("运行 BFS");
-            runButton.addActionListener(event -> runFeature(outputArea, () -> buildFortressBfsText(parseIntOrDefault(target.getText(), 8))));
+            runButton.addActionListener(event -> {
+                int parsedTarget = parseIntOrDefault(target.getText(), 8);
+                runVisualization(visualizationPanel, () -> Optional.of(VisualizationTraceFactory.fortressBfsTrace(parsedTarget)));
+                runFeature(outputArea, () -> buildFortressBfsText(parsedTarget));
+            });
             panel.add(runButton);
         } else if (pdfSection.equals("5. Food Harvesting")) {
             JTextField noFood = new JTextField("9", 12);
             panel.add(new JLabel("无粮节点:"));
             panel.add(noFood);
             JButton runButton = new JButton("规划路线");
-            runButton.addActionListener(event -> runFeature(outputArea, () -> buildFoodHarvestText(parseIntegerSet(noFood.getText(), Set.of(9)))));
+            runButton.addActionListener(event -> {
+                Set<Integer> parsedNoFood = parseIntegerSet(noFood.getText(), Set.of(9));
+                runVisualization(visualizationPanel, () -> Optional.of(VisualizationTraceFactory.foodHarvestTrace(parsedNoFood)));
+                runFeature(outputArea, () -> buildFoodHarvestText(parsedNoFood));
+            });
             panel.add(runButton);
         } else if (pdfSection.contains("Encrypted Text")) {
             JTextField cipherText = new JTextField(SAMPLE_CIPHER, 42);
@@ -221,9 +273,19 @@ public final class SunWuDashboard {
             runButton.addActionListener(event -> runFeature(outputArea, () -> buildCipherText(cipherText.getText(), parseIntOrDefault(shift.getText(), 7))));
             panel.add(runButton);
         } else if (pdfSection.equals("7. Red Cliff on Fire")) {
-            addRunButton(panel, outputArea, "统计集群", SunWuDashboard::buildFireClusterText);
+            JButton runButton = new JButton("统计集群");
+            runButton.addActionListener(event -> {
+                runVisualization(visualizationPanel, () -> Optional.of(VisualizationTraceFactory.fireClusterTrace()));
+                runFeature(outputArea, SunWuDashboard::buildFireClusterText);
+            });
+            panel.add(runButton);
         } else if (pdfSection.contains("Hua Rong")) {
-            addRunButton(panel, outputArea, "搜索迷宫路径", SunWuDashboard::buildMazeText);
+            JButton runButton = new JButton("搜索迷宫路径");
+            runButton.addActionListener(event -> {
+                runVisualization(visualizationPanel, () -> Optional.of(VisualizationTraceFactory.mazeTrace()));
+                runFeature(outputArea, SunWuDashboard::buildMazeText);
+            });
+            panel.add(runButton);
         } else if (pdfSection.contains("Graphic User Interface")) {
             addRunButton(panel, outputArea, "查看 GUI 覆盖范围", SunWuDashboard::buildOverviewText);
         } else if (pdfSection.contains("Extra Algorithm")) {
@@ -234,20 +296,23 @@ public final class SunWuDashboard {
             panel.add(new JLabel("敌营节点:"));
             panel.add(target);
             JButton runButton = new JButton("运行 Dijkstra");
-            runButton.addActionListener(event -> runFeature(outputArea, () -> buildWeightedPathText(
-                (String) generalBox.getSelectedItem(),
-                parseIntOrDefault(target.getText(), 8)
-            )));
+            runButton.addActionListener(event -> {
+                String generalName = (String) generalBox.getSelectedItem();
+                int parsedTarget = parseIntOrDefault(target.getText(), 8);
+                runVisualization(visualizationPanel, () -> Optional.of(VisualizationTraceFactory.weightedPathTrace(generalName, parsedTarget)));
+                runFeature(outputArea, () -> buildWeightedPathText(generalName, parsedTarget));
+            });
             panel.add(runButton);
         } else if (pdfSection.contains("Dynamic Arrow")) {
             JTextField waves = new JTextField("300,1500,1000,2000,600,800,300,500,400", 34);
             panel.add(new JLabel("箭雨:"));
             panel.add(waves);
             JButton runButton = new JButton("运行动态规则");
-            runButton.addActionListener(event -> runFeature(outputArea, () -> buildDynamicArrowText(parseIntegerList(
-                waves.getText(),
-                List.of(300, 1500, 1000, 2000, 600, 800, 300, 500, 400)
-            ))));
+            runButton.addActionListener(event -> {
+                List<Integer> parsedWaves = parseIntegerList(waves.getText(), List.of(300, 1500, 1000, 2000, 600, 800, 300, 500, 400));
+                runVisualization(visualizationPanel, () -> Optional.of(VisualizationTraceFactory.dynamicBoatTrace(parsedWaves)));
+                runFeature(outputArea, () -> buildDynamicArrowText(parsedWaves));
+            });
             panel.add(runButton);
         } else if (pdfSection.contains("Food Harvesting I")) {
             JComboBox<String> focusBox = new JComboBox<>(new String[]{"Politic", "Intelligence"});
@@ -257,12 +322,19 @@ public final class SunWuDashboard {
             panel.add(new JLabel("粮草节点数:"));
             panel.add(nodeCount);
             JButton productionButton = new JButton("最大化产量");
-            productionButton.addActionListener(event -> runFeature(outputArea, () -> buildFoodProductionText(
-                abilityFromLabel((String) focusBox.getSelectedItem()),
-                parseIntOrDefault(nodeCount.getText(), 8)
-            )));
+            productionButton.addActionListener(event -> {
+                AbilityType focus = abilityFromLabel((String) focusBox.getSelectedItem());
+                int parsedNodeCount = parseIntOrDefault(nodeCount.getText(), 8);
+                runVisualization(visualizationPanel, () -> Optional.of(VisualizationTraceFactory.foodProductionTrace(focus, parsedNodeCount)));
+                runFeature(outputArea, () -> buildFoodProductionText(focus, parsedNodeCount));
+            });
             panel.add(productionButton);
-            addRunButton(panel, outputArea, "三将占营模拟", SunWuDashboard::buildGuardedCampText);
+            JButton guardedButton = new JButton("三将占营模拟");
+            guardedButton.addActionListener(event -> {
+                runVisualization(visualizationPanel, () -> Optional.of(VisualizationTraceFactory.guardedCampTrace()));
+                runFeature(outputArea, SunWuDashboard::buildGuardedCampText);
+            });
+            panel.add(guardedButton);
         } else if (pdfSection.contains("More Secured")) {
             JTextField plainText = new JTextField("Attack at dawn", 18);
             JTextField rule = new JTextField("3", 4);
@@ -277,10 +349,63 @@ public final class SunWuDashboard {
             )));
             panel.add(runButton);
         } else if (pdfSection.contains("Optimized Points")) {
-            addRunButton(panel, outputArea, "计算最优投掷点", SunWuDashboard::buildOptimalFireText);
+            JButton runButton = new JButton("计算最优投掷点");
+            runButton.addActionListener(event -> {
+                runVisualization(visualizationPanel, () -> Optional.of(VisualizationTraceFactory.optimizedFireTrace()));
+                runFeature(outputArea, SunWuDashboard::buildOptimalFireText);
+            });
+            panel.add(runButton);
         }
 
         return panel;
+    }
+
+    private static void setVisualization(JPanel visualizationPanel, VisualizationTrace trace) {
+        visualizationPanel.removeAll();
+        visualizationPanel.add(new TracePlaybackPanel(trace), BorderLayout.CENTER);
+        visualizationPanel.revalidate();
+        visualizationPanel.repaint();
+    }
+
+    private static void runVisualization(JPanel visualizationPanel, Supplier<Optional<VisualizationTrace>> supplier) {
+        cancelActiveVisualizationWorker();
+        visualizationPanel.removeAll();
+        visualizationPanel.add(new JLabel("Preparing visualization..."), BorderLayout.CENTER);
+        visualizationPanel.revalidate();
+        visualizationPanel.repaint();
+        SwingWorker<Optional<VisualizationTrace>, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Optional<VisualizationTrace> doInBackground() {
+                return supplier.get();
+            }
+
+            @Override
+            protected void done() {
+                if (isCancelled() || activeVisualizationWorker != this) {
+                    return;
+                }
+                try {
+                    Optional<VisualizationTrace> trace = get();
+                    if (trace.isPresent()) {
+                        setVisualization(visualizationPanel, trace.get());
+                    } else {
+                        visualizationPanel.removeAll();
+                        visualizationPanel.add(new JLabel("No process visualization for this module."), BorderLayout.CENTER);
+                        visualizationPanel.revalidate();
+                        visualizationPanel.repaint();
+                    }
+                } catch (InterruptedException exception) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException exception) {
+                    visualizationPanel.removeAll();
+                    visualizationPanel.add(new JLabel("Visualization failed: " + exception.getCause().getMessage()), BorderLayout.CENTER);
+                    visualizationPanel.revalidate();
+                    visualizationPanel.repaint();
+                }
+            }
+        };
+        activeVisualizationWorker = worker;
+        worker.execute();
     }
 
     private static void addRunButton(JPanel panel, JTextArea outputArea, String label, Supplier<String> supplier) {
@@ -323,6 +448,12 @@ public final class SunWuDashboard {
     private static void cancelActiveWorker() {
         if (activeWorker != null && !activeWorker.isDone()) {
             activeWorker.cancel(true);
+        }
+    }
+
+    private static void cancelActiveVisualizationWorker() {
+        if (activeVisualizationWorker != null && !activeVisualizationWorker.isDone()) {
+            activeVisualizationWorker.cancel(true);
         }
     }
 

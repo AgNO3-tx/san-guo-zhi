@@ -23,6 +23,7 @@ public final class SunWuTestRunner {
         run("ClusterFireServiceTest", ClusterFireServiceTest::run, failures);
         run("MazeEscapeServiceTest", MazeEscapeServiceTest::run, failures);
         run("DisplayTextTest", DisplayTextTest::run, failures);
+        run("VisualizationTraceTest", VisualizationTraceTest::run, failures);
 
         if (!failures.isEmpty()) {
             System.err.println("FAILED TESTS:");

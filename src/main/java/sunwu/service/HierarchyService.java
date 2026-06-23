@@ -54,12 +54,10 @@ public final class HierarchyService {
     }
 
     /**
-     * 部门自动分配规则：军事侧重领导力和武力，管理侧重智力和政治。
+     * 部门自动分配规则来自 PDF：智力高于武力进管理部，否则进军事部。
      */
     public DepartmentType assignDepartment(General general) {
-        int militaryScore = general.leadership() + general.strength();
-        int managementScore = general.intelligence() + general.politic();
-        return militaryScore > managementScore ? DepartmentType.MILITARY : DepartmentType.MANAGEMENT;
+        return general.intelligence() > general.strength() ? DepartmentType.MANAGEMENT : DepartmentType.MILITARY;
     }
 
     /**

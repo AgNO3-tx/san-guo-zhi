@@ -13,6 +13,7 @@ The visualization work covers these dashboard entries:
 - Food Harvesting basic route
 - Red Cliff on Fire cluster count
 - Hua Rong Road escape path
+- Weighted Fortress terrain path
 - Dynamic Straw Boats
 - Food Harvesting Extra
 - Optimized Fire Points
@@ -45,6 +46,10 @@ Show the same battlefield graph. Step through the base route and mark each inspe
 ### Hua Rong Road
 
 Show the maze as a grid. Walls, open cells, start, and exit use distinct colors. During playback, highlight BFS expansion from the current cell to neighboring cells. Visited cells remain lightly colored. After reaching the exit, draw the final escape path.
+
+### Weighted Fortress Terrain Path
+
+Show the battlefield graph with terrain-aware route evaluation. During playback, highlight the current node, inspected edge, terrain type, candidate travel time, and currently best known route. After Dijkstra finishes, draw the shortest-time path with a stronger highlighted line.
 
 ### Red Cliff on Fire
 

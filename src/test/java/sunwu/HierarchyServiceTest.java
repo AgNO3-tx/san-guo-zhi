@@ -1,6 +1,7 @@
 package sunwu;
 
 import sunwu.data.SampleData;
+import sunwu.domain.ArmyType;
 import sunwu.domain.DepartmentType;
 import sunwu.domain.General;
 import sunwu.service.HierarchyService;
@@ -40,6 +41,13 @@ public final class HierarchyServiceTest {
         TestSupport.assertTrue(
             view.departmentMembers().get(DepartmentType.MANAGEMENT).stream().anyMatch(g -> g.name().equals("Zhu Ge Jin")),
             "Zhu Ge Jin should be assigned to the management department."
+        );
+
+        General intelligenceSpecialist = new General("Rule Check Strategist", ArmyType.ARCHER, 60, 100, 61, 0, 50);
+        TestSupport.assertEquals(
+            DepartmentType.MANAGEMENT,
+            service.assignDepartment(intelligenceSpecialist),
+            "Department assignment should follow the PDF rule: intelligence greater than strength means management."
         );
     }
 }
