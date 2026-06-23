@@ -12,11 +12,16 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 统一的演示数据入口。
+ * 所有功能都从这里取样例，便于控制台、GUI 和测试保持同一套数据。
+ */
 public final class SampleData {
     private SampleData() {
     }
 
     public static List<General> generals() {
+        // PDF 中给出的吴国人物数据，包含兵种与五项能力。
         return List.of(
             new General("Zhang Zhao", ArmyType.ARCHER, 22, 80, 89, 99, 60),
             new General("Zhou Yu", ArmyType.CAVALRY, 80, 86, 97, 80, 90),
@@ -34,6 +39,7 @@ public final class SampleData {
     }
 
     public static BoatConfig classicBoatConfig() {
+        // 使用 LinkedHashMap 保持 front/left/right/back 的输出顺序稳定。
         Map<String, Integer> directions = new LinkedHashMap<>();
         directions.put("front", 10);
         directions.put("left", 50);
@@ -43,10 +49,12 @@ public final class SampleData {
     }
 
     public static BoatConfig dynamicBoatConfig() {
+        // 动态草船借箭沿用同一套草人配置，只改变箭雨和使用次数规则。
         return classicBoatConfig();
     }
 
     public static BattlefieldGraph battlefieldGraph() {
+        // 敌营进攻和粮草基础路线共用的战场邻接表。
         return new BattlefieldGraph(Map.of(
             1, List.of(2, 3, 6, 10),
             2, List.of(1, 4),
@@ -62,6 +70,7 @@ public final class SampleData {
     }
 
     public static WeightedBattlefieldGraph weightedBattlefieldGraph() {
+        // 带地形版本的战场图，边上的 TerrainType 会参与耗时计算。
         return new WeightedBattlefieldGraph(Map.of(
             1, List.of(
                 new Edge(2, TerrainType.FOREST),
@@ -121,6 +130,7 @@ public final class SampleData {
     }
 
     public static int[][] simpleFireGrid() {
+        // 火烧连环船基础题矩阵：1 表示战船，0 表示空位。
         return new int[][]{
             {1, 1, 0, 0},
             {1, 0, 0, 0},
@@ -130,6 +140,7 @@ public final class SampleData {
     }
 
     public static int[][] optimizedFireGrid() {
+        // 火攻最优投掷点扩展题矩阵，用于分析集群内部最佳坐标。
         return new int[][]{
             {1, 1, 0, 0, 0},
             {1, 1, 1, 0, 0},
@@ -140,6 +151,7 @@ public final class SampleData {
     }
 
     public static int[][] huaRongMaze() {
+        // 华容道迷宫：1=墙，0=通路，2=起点，3=出口。
         return new int[][]{
             {1, 1, 1, 1, 1, 1, 1, 1, 1},
             {1, 2, 0, 0, 0, 1, 0, 3, 1},

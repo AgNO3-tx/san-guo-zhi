@@ -16,9 +16,17 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+/**
+ * 战场路径服务。
+ * 包含无权图 BFS 最短路径和带地形权重的 Dijkstra 最短时间路径。
+ */
 public final class BattlefieldPathService {
+    /**
+     * 使用 BFS 找到 start 到 target 的所有最短路径。
+     */
     public PathResult findShortestPaths(BattlefieldGraph graph, int start, int target) {
         Map<Integer, Integer> distance = new HashMap<>();
+        // parents 保存所有能以最短距离到达某节点的前驱节点，用于最后回溯所有最短路径。
         Map<Integer, List<Integer>> parents = new HashMap<>();
         Queue<Integer> queue = new ArrayDeque<>();
 
@@ -33,6 +41,7 @@ public final class BattlefieldPathService {
                     parents.put(next, new ArrayList<>(List.of(node)));
                     queue.add(next);
                 } else if (distance.get(next) == distance.get(node) + 1) {
+                    // 如果发现另一条同样短的路径，也记录下来。
                     parents.computeIfAbsent(next, ignored -> new ArrayList<>()).add(node);
                 }
             }
@@ -44,6 +53,9 @@ public final class BattlefieldPathService {
         return new PathResult(allPaths);
     }
 
+    /**
+     * 从 target 反向沿 parents 回溯到 start，生成一条完整路径。
+     */
     private void buildPaths(int node, int start, Map<Integer, List<Integer>> parents, List<Integer> current, List<List<Integer>> result) {
         current.add(0, node);
         if (node == start) {
@@ -57,7 +69,11 @@ public final class BattlefieldPathService {
         current.remove(0);
     }
 
+    /**
+     * 使用 Dijkstra 算法计算从 Node 1 到目标节点的最短时间路径。
+     */
     public WeightedPathResult findShortestTimePath(WeightedBattlefieldGraph graph, General general, int target) {
+        // 优先队列中只需要节点和当前累计成本。
         record NodeState(int node, double cost) {
         }
 
@@ -71,6 +87,7 @@ public final class BattlefieldPathService {
         while (!queue.isEmpty()) {
             NodeState state = queue.remove();
             if (state.cost() > distance.getOrDefault(state.node(), Double.POSITIVE_INFINITY)) {
+                // 队列里可能存在过期状态，发现不是最优时直接跳过。
                 continue;
             }
             for (Edge edge : graph.adjacency().getOrDefault(state.node(), List.of())) {
@@ -86,12 +103,16 @@ public final class BattlefieldPathService {
         List<Integer> path = new ArrayList<>();
         Integer current = target;
         while (current != null) {
+            // previous 记录最短路径树，反向插入即可得到正向路径。
             path.add(0, current);
             current = previous.get(current);
         }
         return new WeightedPathResult(path, distance.getOrDefault(target, Double.POSITIVE_INFINITY));
     }
 
+    /**
+     * 按兵种和地形折算经过一条边所需时间。
+     */
     private double travelTime(ArmyType armyType, TerrainType terrainType) {
         return switch (armyType) {
             case CAVALRY -> switch (terrainType) {

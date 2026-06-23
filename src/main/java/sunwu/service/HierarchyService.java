@@ -12,7 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 吴国层级树服务。
+ * 根据武将能力自动分配部门，并构建 Sun Quan -> 两位 chief -> 普通武将的三层结构。
+ */
 public final class HierarchyService {
+    /**
+     * 构建完整层级视图，同时保留每个部门的成员集合。
+     */
     public HierarchyView buildHierarchy(List<General> generals) {
         General emperor = new General("Sun Quan", ArmyType.CAVALRY, 96, 98, 72, 77, 95);
         General chiefMilitary = findGeneral(generals, "Zhou Yu");
@@ -28,8 +35,10 @@ public final class HierarchyService {
         departmentMembers.put(DepartmentType.MILITARY, new LinkedHashSet<>());
         departmentMembers.put(DepartmentType.MANAGEMENT, new LinkedHashSet<>());
 
+        // 为了输出稳定，先按姓名排序再挂到部门节点下。
         for (General general : generals.stream().sorted(Comparator.comparing(General::name)).toList()) {
             if (general.name().equals("Zhou Yu") || general.name().equals("Zhang Zhao")) {
+                // 两位 chief 已经作为第二层节点，避免重复加入第三层。
                 continue;
             }
             DepartmentType departmentType = assignDepartment(general);
@@ -44,12 +53,18 @@ public final class HierarchyService {
         return new HierarchyView(root, departmentMembers);
     }
 
+    /**
+     * 部门自动分配规则：军事侧重领导力和武力，管理侧重智力和政治。
+     */
     public DepartmentType assignDepartment(General general) {
         int militaryScore = general.leadership() + general.strength();
         int managementScore = general.intelligence() + general.politic();
         return militaryScore > managementScore ? DepartmentType.MILITARY : DepartmentType.MANAGEMENT;
     }
 
+    /**
+     * 层级树需要固定 chief，如果样例数据缺失则直接暴露配置错误。
+     */
     private General findGeneral(List<General> generals, String name) {
         return generals.stream()
             .filter(general -> general.name().equals(name))

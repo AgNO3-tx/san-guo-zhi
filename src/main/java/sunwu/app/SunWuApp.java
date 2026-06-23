@@ -22,9 +22,16 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * 系统的控制台主入口。
+ * 这个类只负责菜单调度、读取用户输入和调用服务层，不直接实现具体算法。
+ */
 public final class SunWuApp {
+    // 原题草船借箭样例：箭雨数量按轮次递减。
     private static final List<Integer> CLASSIC_ARROWS = List.of(2000, 1500, 1000, 800, 600, 500, 300, 300);
+    // 扩展题样例：箭雨数量不再有序，用来测试动态策略。
     private static final List<Integer> DYNAMIC_ARROWS = List.of(300, 1500, 1000, 2000, 600, 800, 300, 500, 400);
+    // PDF 中 Caesar 密文样例，默认用于演示特殊语法解密。
     private static final String SAMPLE_CIPHER = "^hkcpzl$^jhv$^jhv$av$bzl$^aol$^johpu$^zayhalnlt,$(ojpod)$pz$av$johpu$opz$(zwpozlsaahi)$dpao$zayvun$pyvu$johpuz.";
 
     private final Scanner scanner;
@@ -46,6 +53,9 @@ public final class SunWuApp {
         new SunWuApp(new Scanner(System.in)).run();
     }
 
+    /**
+     * 主循环：显示菜单、读取编号、分派到对应演示方法。
+     */
     private void run() {
         while (true) {
             System.out.println(ConsoleMenu.mainMenu());
@@ -77,6 +87,7 @@ public final class SunWuApp {
         }
     }
 
+    // 以下 showXxx 方法是菜单到服务层之间的薄封装，便于每个功能独立演示。
     private void showHierarchy() {
         System.out.println(formatter.formatHierarchy(hierarchyService.buildHierarchy(SampleData.generals())));
     }
@@ -193,6 +204,7 @@ public final class SunWuApp {
     private AbilityType askAbility(AbilityType defaultValue) {
         System.out.print(ConsoleMenu.abilityPrompt());
         String input = scanner.nextLine().trim();
+        // 输入非法或直接回车时使用调用方给定的默认属性。
         return switch (input) {
             case "1" -> AbilityType.LEADERSHIP;
             case "2" -> AbilityType.STRENGTH;
@@ -214,6 +226,7 @@ public final class SunWuApp {
             name = defaultName;
         }
         String finalName = name;
+        // 武将姓名允许忽略大小写；找不到时回退到默认武将，保证演示流程不中断。
         return SampleData.generals().stream()
             .filter(general -> general.name().equalsIgnoreCase(finalName))
             .findFirst()
@@ -231,6 +244,7 @@ public final class SunWuApp {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException ignored) {
+            // 交互式演示中输入错误很常见，直接回退默认值比抛异常更友好。
             System.out.println("输入不是整数，使用默认值 " + defaultValue + "。");
             return defaultValue;
         }
@@ -242,6 +256,7 @@ public final class SunWuApp {
             return defaultValue;
         }
         try {
+            // 支持 “1,2,3” 这样的简单逗号分隔格式。
             return Arrays.stream(input.split(","))
                 .map(String::trim)
                 .filter(part -> !part.isEmpty())

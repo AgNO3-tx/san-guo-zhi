@@ -1,9 +1,15 @@
 package sunwu.app;
 
+/**
+ * 控制台菜单文本集中放在这里，避免主程序里散落大量展示字符串。
+ */
 public final class ConsoleMenu {
     private ConsoleMenu() {
     }
 
+    /**
+     * 返回主菜单。菜单编号必须和 {@link SunWuApp} 中的 switch 分支保持一致。
+     */
     public static String mainMenu() {
         return """
             === Sun Wu Battle System ===
@@ -28,6 +34,9 @@ public final class ConsoleMenu {
             """;
     }
 
+    /**
+     * 返回武将能力属性选择提示，供排序、查找、组队等功能复用。
+     */
     public static String abilityPrompt() {
         return """
             选择属性:

@@ -6,12 +6,16 @@ import sunwu.service.ArrowBorrowingService;
 
 import java.util.List;
 
+/**
+ * 验证草船借箭基础规则和动态规则的关键结果。
+ */
 public final class ArrowBorrowingServiceTest {
     private ArrowBorrowingServiceTest() {
     }
 
     public static void run() {
         ArrowBorrowingService service = new ArrowBorrowingService();
+        // 原题样例应选择能最大化总箭数的方向序列。
         ArrowPlanResult result = service.planClassicBorrowing(
             SampleData.classicBoatConfig(),
             List.of(2000, 1500, 1000, 800, 600, 500, 300, 300)
@@ -24,6 +28,7 @@ public final class ArrowBorrowingServiceTest {
         );
         TestSupport.assertEquals(2771, result.totalArrows(), "Total arrows should match sample.");
 
+        // 动态规则重点验证每一轮都有决策，并且能获得正数箭量。
         ArrowPlanResult dynamicResult = service.planDynamicBorrowing(
             SampleData.dynamicBoatConfig(),
             List.of(300, 1500, 1000, 2000, 600, 800, 300, 500, 400)
