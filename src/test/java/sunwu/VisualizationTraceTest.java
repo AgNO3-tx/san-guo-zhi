@@ -129,6 +129,7 @@ public final class VisualizationTraceTest {
         assertCanPaint(new TracePlaybackPanel(VisualizationTraceFactory.mazeTrace()), 760, 320, "Grid trace should paint without throwing.");
         assertCanPaint(new TracePlaybackPanel(VisualizationTraceFactory.classicBoatTrace(List.of())), 760, 320, "Empty boat trace should paint a final zero-result step.");
         assertRapidPlaybackClicksDoNotBreakPanel();
+        assertMazeGridFitsCompactCanvas();
         assertBattlefieldLayoutKeepsMapAspect();
         assertBattlefieldLayoutMatchesAssignmentMap();
         assertDijkstraSettledTimesAreMonotonic();
@@ -190,6 +191,17 @@ public final class VisualizationTraceTest {
             }
             TestSupport.assertTrue(panel.getComponentCount() > 0, "Rapid playback clicks should keep panel components intact.");
         }, "Rapid playback clicks should not throw.");
+    }
+
+    private static void assertMazeGridFitsCompactCanvas() {
+        int rows = SampleData.huaRongMaze().length;
+        int cols = SampleData.huaRongMaze()[0].length;
+        int cell = TracePlaybackPanel.gridCellSize(cols, rows, 720, 260);
+        int startY = TracePlaybackPanel.gridStartY(rows, cell, 260);
+        TestSupport.assertTrue(
+            startY + rows * cell <= 260,
+            "Maze visualization should fit all rows inside the canvas instead of being clipped by the output area."
+        );
     }
 
     private static JButton findButton(Container container, String label) {

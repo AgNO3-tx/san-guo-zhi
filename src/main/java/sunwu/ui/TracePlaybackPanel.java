@@ -40,7 +40,7 @@ public final class TracePlaybackPanel extends JPanel {
         this.timer.setCoalesce(true);
 
         setLayout(new BorderLayout(8, 8));
-        setPreferredSize(new Dimension(760, 320));
+        setPreferredSize(new Dimension(760, 360));
 
         JButton playButton = new JButton("播放");
         JButton pauseButton = new JButton("暂停");
@@ -92,6 +92,19 @@ public final class TracePlaybackPanel extends JPanel {
             offsetX + (int) Math.round((point.x - minX) * scale),
             offsetY + (int) Math.round((point.y - minY) * scale)
         );
+    }
+
+    public static int gridCellSize(int cols, int rows, int width, int height) {
+        int availableWidth = Math.max(1, width - 80);
+        int availableHeight = Math.max(1, height - 58);
+        return Math.max(1, Math.min(32, Math.min(availableWidth / cols, availableHeight / rows)));
+    }
+
+    public static int gridStartY(int rows, int cell, int height) {
+        int top = 36;
+        int bottom = 12;
+        int availableHeight = Math.max(1, height - top - bottom);
+        return top + Math.max(0, (availableHeight - rows * cell) / 2);
     }
 
     @Override
@@ -146,7 +159,7 @@ public final class TracePlaybackPanel extends JPanel {
 
         private TraceCanvas(VisualizationTrace trace) {
             this.trace = trace == null ? VisualizationTrace.score("No Visualization", List.of()) : trace;
-            setPreferredSize(new Dimension(720, 260));
+            setPreferredSize(new Dimension(720, 300));
             setBackground(BACKGROUND);
         }
 
@@ -270,9 +283,9 @@ public final class TracePlaybackPanel extends JPanel {
             }
             int rows = grid.length;
             int cols = grid[0].length;
-            int cell = Math.max(28, Math.min((getWidth() - 80) / cols, (getHeight() - 70) / rows));
+            int cell = TracePlaybackPanel.gridCellSize(cols, rows, getWidth(), getHeight());
             int startX = (getWidth() - cols * cell) / 2;
-            int startY = 42;
+            int startY = TracePlaybackPanel.gridStartY(rows, cell, getHeight());
 
             for (int row = 0; row < rows; row++) {
                 for (int col = 0; col < cols; col++) {

@@ -15,11 +15,44 @@ public class GrassBoatSimulation {
     private int[] scarecrowCount; // 各方向草人数量
     private int[] usageCount;     // 各方向已使用次数
     private int totalArrows;      // 总获得箭数
+    private List<RoundResult> roundResults = new ArrayList<>(); // 轮次结果追踪
+
+    /**
+     * 单轮结果（供可视化使用）
+     */
+    public static class RoundResult {
+        public final int round;
+        public final int arrowsIncoming;
+        public final int bestDirection; // 0=前,1=左,2=右,3=后
+        public final double efficiency;
+        public final int gainedArrows;
+        public final int totalArrows;
+        public final int[] scarecrowsRemaining; // 四个方向剩余草人
+
+        public RoundResult(int round, int arrowsIncoming, int bestDirection,
+                          double efficiency, int gainedArrows, int totalArrows,
+                          int[] scarecrowsRemaining) {
+            this.round = round;
+            this.arrowsIncoming = arrowsIncoming;
+            this.bestDirection = bestDirection;
+            this.efficiency = efficiency;
+            this.gainedArrows = gainedArrows;
+            this.totalArrows = totalArrows;
+            this.scarecrowsRemaining = scarecrowsRemaining.clone();
+        }
+    }
+
+    /** 获取所有轮次结果 */
+    public List<RoundResult> getRoundResults() { return roundResults; }
+
+    /** 获取方向名称 */
+    public String[] getDirections() { return directions; }
 
     public GrassBoatSimulation() {
         scarecrowCount = new int[4];
         usageCount = new int[4];
         totalArrows = 0;
+        roundResults = new ArrayList<>();
     }
 
     /**
@@ -31,6 +64,7 @@ public class GrassBoatSimulation {
         this.scarecrowCount = scarecrows.clone();
         this.usageCount = new int[4];
         this.totalArrows = 0;
+        this.roundResults = new ArrayList<>();
 
         System.out.println("\n🏹 草船借箭模拟");
         System.out.println("=".repeat(60));
@@ -64,6 +98,10 @@ public class GrassBoatSimulation {
             // 更新数据
             scarecrowCount[bestDir] = Math.max(0, scarecrowCount[bestDir] - gainedArrows / 10);
             totalArrows += gainedArrows;
+
+            // 记录本轮结果
+            roundResults.add(new RoundResult(round, arrowsThisRound, bestDir,
+                    efficiency, gainedArrows, totalArrows, scarecrowCount.clone()));
 
             System.out.printf("  最优朝向：%s（剩余草人%d，已用%d次）\n",
                     directions[bestDir], scarecrowCount[bestDir], usageCount[bestDir]);
@@ -105,6 +143,7 @@ public class GrassBoatSimulation {
         this.scarecrowCount = scarecrows.clone();
         this.usageCount = new int[4];
         this.totalArrows = 0;
+        this.roundResults = new ArrayList<>();
         Random rand = new Random();
 
         System.out.println("\n🏹 动态草船借箭（拓展版）");
@@ -130,6 +169,10 @@ public class GrassBoatSimulation {
 
             scarecrowCount[bestDir] = Math.max(0, scarecrowCount[bestDir] - gainedArrows / 8);
             totalArrows += gainedArrows;
+
+            // 记录本轮结果
+            roundResults.add(new RoundResult(round, arrowsThisRound, bestDir,
+                    efficiency, gainedArrows, totalArrows, scarecrowCount.clone()));
 
             System.out.printf("  最优朝向：%s（剩余草人%d，已用%d次）\n",
                     directions[bestDir], scarecrowCount[bestDir], usageCount[bestDir]);

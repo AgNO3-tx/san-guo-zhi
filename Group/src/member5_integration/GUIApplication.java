@@ -186,26 +186,37 @@ public class GUIApplication extends JFrame {
         btnPanel.add(btnSimulate);
         btnPanel.add(btnDynamic);
 
-        JTextArea infoArea = new JTextArea(5, 40);
-        infoArea.setEditable(false);
-        infoArea.setText("初始草人分布：前=80 左=60 右=70 后=50\n" +
-                "基础版：每轮箭数递减，单方向最多3次\n" +
-                "动态版：箭数随机，单方向最多2次");
-        infoArea.setFont(new Font("宋体", Font.PLAIN, 13));
+        // 船过程可视化面板
+        BoatVisualizer boatViz = new BoatVisualizer();
+        boatViz.setPreferredSize(new Dimension(500, 320));
+        boatViz.setBorder(new TitledBorder("草船借箭过程展示"));
+
+        // 信息提示
+        JLabel infoLabel = new JLabel("初始草人分布：前=80 左=60 右=70 后=50 | 基础版3次/方向，动态版2次/方向");
+        infoLabel.setFont(new Font("宋体", Font.PLAIN, 12));
+        infoLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(boatViz, BorderLayout.CENTER);
+        centerPanel.add(infoLabel, BorderLayout.SOUTH);
 
         panel.add(btnPanel, BorderLayout.NORTH);
-        panel.add(new JScrollPane(infoArea), BorderLayout.CENTER);
+        panel.add(centerPanel, BorderLayout.CENTER);
 
         btnSimulate.addActionListener(e -> {
             GrassBoatSimulation boat = new GrassBoatSimulation();
             String output = captureOutput(() -> boat.simulate(DataInitializer.initScarecrows(), 8));
             appendOutput(output);
+            // 更新可视化
+            boatViz.updateSimulation(DataInitializer.initScarecrows(), boat.getRoundResults());
         });
 
         btnDynamic.addActionListener(e -> {
             GrassBoatSimulation boat = new GrassBoatSimulation();
             String output = captureOutput(() -> boat.dynamicSimulate(DataInitializer.initScarecrows(), 8));
             appendOutput(output);
+            // 更新可视化
+            boatViz.updateSimulation(DataInitializer.initScarecrows(), boat.getRoundResults());
         });
 
         return panel;
@@ -264,27 +275,21 @@ public class GUIApplication extends JFrame {
         JButton btnRun = new JButton("搜索所有可达敌营路径");
         btnRun.setFont(new Font("宋体", Font.PLAIN, 14));
 
-        JTextArea infoArea = new JTextArea(8, 40);
-        infoArea.setEditable(false);
-        infoArea.setText("地图结构（有向图）：\n" +
-                "Node 1 → 2, 3\n" +
-                "Node 2 → 4, 5\n" +
-                "Node 3 → 5, 6\n" +
-                "Node 4 → 7\n" +
-                "Node 5 → 7, 8\n" +
-                "Node 6 → 8, 9\n" +
-                "Node 7 → 10 (敌营)\n" +
-                "Node 8 → 10 (敌营)\n" +
-                "Node 9 → 10 (敌营)");
-        infoArea.setFont(new Font("宋体", Font.PLAIN, 13));
+        // 图可视化面板 - 使用预置布局
+        GraphVisualizer bfsViz = GraphVisualizer.createBFSMap();
+        bfsViz.setPreferredSize(new Dimension(500, 400));
 
         panel.add(btnRun, BorderLayout.NORTH);
-        panel.add(new JScrollPane(infoArea), BorderLayout.CENTER);
+        panel.add(bfsViz, BorderLayout.CENTER);
 
         btnRun.addActionListener(e -> {
-            BFSPathFinder finder = new BFSPathFinder(Graph.buildDefaultMap());
+            Graph bfsGraph = Graph.buildDefaultMap();
+            BFSPathFinder finder = new BFSPathFinder(bfsGraph);
             String output = captureOutput(() -> finder.runDefault());
             appendOutput(output);
+            // 更新图可视化 - 高亮所有找到的路径
+            List<List<Integer>> paths = finder.findAllPaths(1, Arrays.asList(10));
+            bfsViz.highlightAllPaths(paths);
         });
 
         return panel;
@@ -296,25 +301,24 @@ public class GUIApplication extends JFrame {
         JButton btnRun = new JButton("规划粮草征收路径");
         btnRun.setFont(new Font("宋体", Font.PLAIN, 14));
 
-        JTextArea infoArea = new JTextArea(8, 40);
-        infoArea.setEditable(false);
-        infoArea.setText("粮草分布：\n" +
-                "Node 1: 0 (起点)\n" +
-                "Node 2: 50  Node 3: 30\n" +
-                "Node 4: 0   Node 5: 80\n" +
-                "Node 6: 60  Node 7: 40\n" +
-                "Node 8: 0\n" +
-                "目标：从Node1出发，收集所有粮草后返回");
-        infoArea.setFont(new Font("宋体", Font.PLAIN, 13));
+        // 图可视化面板 - 使用预置布局
+        GraphVisualizer grainViz = GraphVisualizer.createGrainMap();
+        grainViz.setPreferredSize(new Dimension(500, 400));
 
         panel.add(btnRun, BorderLayout.NORTH);
-        panel.add(new JScrollPane(infoArea), BorderLayout.CENTER);
+        panel.add(grainViz, BorderLayout.CENTER);
 
         btnRun.addActionListener(e -> {
-            GrainCollector collector = new GrainCollector(
-                    Graph.buildGrainMap(), Graph.getDefaultGrainMap());
+            Graph grainGraph = Graph.buildGrainMap();
+            Map<Integer, Integer> grainMap = Graph.getDefaultGrainMap();
+            GrainCollector collector = new GrainCollector(grainGraph, grainMap);
             String output = captureOutput(() -> collector.runDefault());
             appendOutput(output);
+            // 更新可视化
+            List<Integer> path = collector.collectGrain(1);
+            if (!path.isEmpty()) {
+                grainViz.highlightPath(path);
+            }
         });
 
         return panel;
@@ -427,13 +431,25 @@ public class GUIApplication extends JFrame {
         // 拓展2：地形路径
         JPanel terrainPanel = new JPanel(new BorderLayout());
         terrainPanel.setBorder(new TitledBorder("带地形速度的最短时间路径"));
+
+        JPanel tTop = new JPanel(new FlowLayout());
         JButton tBtn = new JButton("运行地形路径分析");
-        terrainPanel.add(tBtn, BorderLayout.CENTER);
+        tTop.add(tBtn);
+
+        // 地形路径图可视化 - 使用预置布局
+        GraphVisualizer terrainViz = GraphVisualizer.createTerrainMap();
+        terrainViz.setPreferredSize(new Dimension(500, 250));
+
+        terrainPanel.add(tTop, BorderLayout.NORTH);
+        terrainPanel.add(terrainViz, BorderLayout.CENTER);
 
         tBtn.addActionListener(e -> {
             TerrainPathFinder finder = TerrainPathFinder.buildDefaultMap();
             String output = captureOutput(() -> finder.runDefault());
             appendOutput(output);
+            // 可视化步兵路径
+            TerrainPathFinder.PathResult pr = finder.findShortestTimePath(1, 8, TerrainPathFinder.TroopType.步兵);
+            terrainViz.highlightPath(pr.path);
         });
 
         // 拓展3：动态草船借箭
@@ -453,6 +469,13 @@ public class GUIApplication extends JFrame {
         panel.add(dynamicPanel);
 
         return panel;
+    }
+
+    /**
+     * 从TerrainPathFinder提取邻接表（供可视化使用）
+     */
+    private Map<Integer, List<Integer>> buildAdjFromTerrain(TerrainPathFinder finder) {
+        return finder.getAdjacencyForVisualization();
     }
 
     /**

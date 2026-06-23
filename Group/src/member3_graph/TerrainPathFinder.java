@@ -114,11 +114,11 @@ public class TerrainPathFinder {
         return new PathResult(path, minTime[end]);
     }
 
-    static class PathResult {
-        List<Integer> path;
-        double totalTime;
+    public static class PathResult {
+        public List<Integer> path;
+        public double totalTime;
 
-        PathResult(List<Integer> path, double totalTime) {
+        public PathResult(List<Integer> path, double totalTime) {
             this.path = path;
             this.totalTime = totalTime;
         }
@@ -194,5 +194,23 @@ public class TerrainPathFinder {
         for (TroopType troop : TroopType.values()) {
             finder.printPath(1, 8, troop);
         }
+    }
+
+    /** 获取节点地形（供可视化使用） */
+    public Terrain getTerrain(int node) {
+        return nodeTerrain.get(node);
+    }
+
+    /** 获取简化邻接表（供可视化使用） */
+    public Map<Integer, List<Integer>> getAdjacencyForVisualization() {
+        Map<Integer, List<Integer>> result = new HashMap<>();
+        for (Map.Entry<Integer, List<Edge>> entry : adjList.entrySet()) {
+            List<Integer> neighbors = new ArrayList<>();
+            for (Edge e : entry.getValue()) {
+                neighbors.add(e.to);
+            }
+            result.put(entry.getKey(), neighbors);
+        }
+        return result;
     }
 }
