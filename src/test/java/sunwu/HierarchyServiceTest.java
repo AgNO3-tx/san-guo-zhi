@@ -1,11 +1,11 @@
 package sunwu;
 
 import sunwu.data.SampleData;
-import sunwu.domain.ArmyType;
-import sunwu.domain.DepartmentType;
-import sunwu.domain.General;
-import sunwu.service.HierarchyService;
-import sunwu.service.HierarchyView;
+import sunwu.common.ArmyType;
+import sunwu.feature.hierarchy.DepartmentType;
+import sunwu.common.General;
+import sunwu.feature.hierarchy.HierarchyService;
+import sunwu.feature.hierarchy.HierarchyView;
 
 import java.util.Set;
 import java.util.stream.Collectors;

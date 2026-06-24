@@ -1,9 +1,9 @@
 package sunwu;
 
 import sunwu.data.SampleData;
-import sunwu.domain.AbilityType;
-import sunwu.service.FoodHarvestService;
-import sunwu.service.FoodSimulationResult;
+import sunwu.common.AbilityType;
+import sunwu.feature.foodharvesting.FoodHarvestService;
+import sunwu.feature.foodharvesting.FoodSimulationResult;
 
 import java.util.HashSet;
 import java.util.List;

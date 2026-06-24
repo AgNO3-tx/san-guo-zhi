@@ -1,8 +1,8 @@
 package sunwu;
 
 import sunwu.data.SampleData;
-import sunwu.service.ClusterAnalysisResult;
-import sunwu.service.ClusterFireService;
+import sunwu.feature.redcliff.ClusterAnalysisResult;
+import sunwu.feature.redcliff.ClusterFireService;
 
 /**
  * 验证火攻矩阵集群数量和每个集群的最优投掷点数量。

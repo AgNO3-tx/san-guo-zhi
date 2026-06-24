@@ -1,7 +1,7 @@
 package sunwu;
 
-import sunwu.service.CipherService;
-import sunwu.service.CipherSummary;
+import sunwu.feature.encryption.CipherService;
+import sunwu.feature.encryption.CipherSummary;
 
 /**
  * 验证 Caesar 特殊语法解密和增强加密的往返能力。

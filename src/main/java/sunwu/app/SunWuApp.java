@@ -1,19 +1,19 @@
 package sunwu.app;
 
 import sunwu.data.SampleData;
-import sunwu.domain.AbilityType;
-import sunwu.domain.ArrowPlanResult;
-import sunwu.domain.General;
-import sunwu.service.ArrowBorrowingService;
-import sunwu.service.BattlefieldPathService;
-import sunwu.service.CipherService;
-import sunwu.service.ClusterFireService;
-import sunwu.service.FoodHarvestService;
-import sunwu.service.GeneralAnalyticsService;
-import sunwu.service.HierarchyService;
-import sunwu.service.MazeEscapeService;
-import sunwu.service.ReportFormatter;
-import sunwu.ui.SunWuDashboard;
+import sunwu.common.AbilityType;
+import sunwu.feature.strawboats.ArrowPlanResult;
+import sunwu.common.General;
+import sunwu.feature.strawboats.ArrowBorrowingService;
+import sunwu.feature.fortress.BattlefieldPathService;
+import sunwu.feature.encryption.CipherService;
+import sunwu.feature.redcliff.ClusterFireService;
+import sunwu.feature.foodharvesting.FoodHarvestService;
+import sunwu.feature.soldier.GeneralAnalyticsService;
+import sunwu.feature.hierarchy.HierarchyService;
+import sunwu.feature.huarongroad.MazeEscapeService;
+import sunwu.common.ReportFormatter;
+import sunwu.feature.gui.SunWuDashboard;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;

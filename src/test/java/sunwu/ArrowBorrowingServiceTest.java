@@ -1,8 +1,8 @@
 package sunwu;
 
 import sunwu.data.SampleData;
-import sunwu.domain.ArrowPlanResult;
-import sunwu.service.ArrowBorrowingService;
+import sunwu.feature.strawboats.ArrowPlanResult;
+import sunwu.feature.strawboats.ArrowBorrowingService;
 
 import java.util.List;
 

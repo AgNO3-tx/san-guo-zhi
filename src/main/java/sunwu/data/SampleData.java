@@ -1,12 +1,12 @@
 package sunwu.data;
 
-import sunwu.domain.ArmyType;
-import sunwu.domain.BattlefieldGraph;
-import sunwu.domain.BoatConfig;
-import sunwu.domain.Edge;
-import sunwu.domain.General;
-import sunwu.domain.TerrainType;
-import sunwu.domain.WeightedBattlefieldGraph;
+import sunwu.common.ArmyType;
+import sunwu.feature.fortress.BattlefieldGraph;
+import sunwu.feature.strawboats.BoatConfig;
+import sunwu.feature.fortress.Edge;
+import sunwu.common.General;
+import sunwu.feature.fortress.TerrainType;
+import sunwu.feature.fortress.WeightedBattlefieldGraph;
 
 import java.util.LinkedHashMap;
 import java.util.List;

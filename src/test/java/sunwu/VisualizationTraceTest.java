@@ -1,13 +1,13 @@
 package sunwu;
 
 import sunwu.data.SampleData;
-import sunwu.domain.AbilityType;
-import sunwu.ui.DashboardFeature;
-import sunwu.ui.SunWuDashboard;
-import sunwu.ui.VisualizationStep;
-import sunwu.ui.TracePlaybackPanel;
-import sunwu.ui.VisualizationTrace;
-import sunwu.ui.VisualizationTraceFactory;
+import sunwu.common.AbilityType;
+import sunwu.feature.gui.DashboardFeature;
+import sunwu.feature.gui.SunWuDashboard;
+import sunwu.feature.gui.VisualizationStep;
+import sunwu.feature.gui.TracePlaybackPanel;
+import sunwu.feature.gui.VisualizationTrace;
+import sunwu.feature.gui.VisualizationTraceFactory;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -254,7 +254,7 @@ public final class VisualizationTraceTest {
 
     private static void assertBfsFinalPathMatchesServiceResult() {
         List<Integer> visualPath = VisualizationTraceFactory.fortressBfsTrace(8).steps().getLast().pathNodes();
-        List<Integer> expectedPath = new sunwu.service.BattlefieldPathService()
+        List<Integer> expectedPath = new sunwu.feature.fortress.BattlefieldPathService()
             .findShortestPaths(SampleData.battlefieldGraph(), 1, 8)
             .paths()
             .getFirst();
@@ -263,7 +263,7 @@ public final class VisualizationTraceTest {
 
     private static void assertFoodTraceFinalPathMatchesServiceResult() {
         List<Integer> visualPath = VisualizationTraceFactory.foodHarvestTrace(Set.of(9)).steps().getLast().pathNodes();
-        List<Integer> expectedPath = new sunwu.service.FoodHarvestService()
+        List<Integer> expectedPath = new sunwu.feature.foodharvesting.FoodHarvestService()
             .planFoodHarvest(SampleData.battlefieldGraph(), Set.of(9))
             .path();
         TestSupport.assertEquals(expectedPath, visualPath, "Food harvesting visualization final path should match the service result.");

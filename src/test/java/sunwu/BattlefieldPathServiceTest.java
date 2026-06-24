@@ -1,11 +1,11 @@
 package sunwu;
 
 import sunwu.data.SampleData;
-import sunwu.domain.AbilityType;
-import sunwu.domain.General;
-import sunwu.service.BattlefieldPathService;
-import sunwu.service.PathResult;
-import sunwu.service.WeightedPathResult;
+import sunwu.common.AbilityType;
+import sunwu.common.General;
+import sunwu.feature.fortress.BattlefieldPathService;
+import sunwu.feature.fortress.PathResult;
+import sunwu.feature.fortress.WeightedPathResult;
 
 import java.util.List;
 

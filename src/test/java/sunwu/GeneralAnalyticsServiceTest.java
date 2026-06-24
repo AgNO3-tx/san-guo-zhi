@@ -1,10 +1,10 @@
 package sunwu;
 
 import sunwu.data.SampleData;
-import sunwu.domain.AbilityType;
-import sunwu.domain.TeamGrade;
-import sunwu.domain.TeamSuggestion;
-import sunwu.service.GeneralAnalyticsService;
+import sunwu.common.AbilityType;
+import sunwu.feature.soldier.TeamGrade;
+import sunwu.feature.soldier.TeamSuggestion;
+import sunwu.feature.soldier.GeneralAnalyticsService;
 
 import java.util.List;
 

@@ -2,14 +2,14 @@ package sunwu;
 
 import sunwu.app.ConsoleMenu;
 import sunwu.data.SampleData;
-import sunwu.domain.AbilityType;
-import sunwu.service.ClusterFireService;
-import sunwu.service.GeneralAnalyticsService;
-import sunwu.service.HierarchyService;
-import sunwu.service.MazeEscapeService;
-import sunwu.service.ReportFormatter;
-import sunwu.ui.DashboardFeature;
-import sunwu.ui.SunWuDashboard;
+import sunwu.common.AbilityType;
+import sunwu.feature.redcliff.ClusterFireService;
+import sunwu.feature.soldier.GeneralAnalyticsService;
+import sunwu.feature.hierarchy.HierarchyService;
+import sunwu.feature.huarongroad.MazeEscapeService;
+import sunwu.common.ReportFormatter;
+import sunwu.feature.gui.DashboardFeature;
+import sunwu.feature.gui.SunWuDashboard;
 
 import java.util.List;
 import java.util.Set;

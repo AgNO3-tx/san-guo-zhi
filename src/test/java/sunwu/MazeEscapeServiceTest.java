@@ -1,8 +1,8 @@
 package sunwu;
 
 import sunwu.data.SampleData;
-import sunwu.service.MazeEscapeResult;
-import sunwu.service.MazeEscapeService;
+import sunwu.feature.huarongroad.MazeEscapeResult;
+import sunwu.feature.huarongroad.MazeEscapeService;
 
 /**
  * 验证华容道迷宫 BFS 能找到从入口到出口的路径。
